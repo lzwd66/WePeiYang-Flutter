@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.BatteryManager
 import android.os.Build
 import android.os.StatFs
+import android.provider.Settings
 import android.util.DisplayMetrics
 import com.twt.service.common.WbyPlugin
 import io.flutter.plugin.common.MethodCall
@@ -78,6 +79,19 @@ class WbyDeviceInfoPlugin : WbyPlugin() {
         )
     }
 
+    /**
+     * 读取系统导航模式："0"=三键(金刚键) "1"=两键药丸 "2"=全手势。
+     * Android 10 以下无手势导航必然是三键；读不到（个别定制 ROM）也按 "0" 兜底，防止冲突
+     */
+    private fun getNavigationMode(): String {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return "0"
+        return try {
+            Settings.Secure.getString(context.contentResolver, "navigation_mode") ?: "0"
+        } catch (_: Exception) {
+            "0"
+        }
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "getDeviceInfo") {
             result.success(
@@ -104,6 +118,8 @@ class WbyDeviceInfoPlugin : WbyPlugin() {
                     "density" to getDensityInfo(),
                 )
             )
+        } else if (call.method == "getNavigationMode") {
+            result.success(getNavigationMode())
         } else {
             result.notImplemented()
         }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show LengthLimitingTextInputFormatter;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:we_pei_yang_flutter/commons/themes/template/wpy_theme_data.dart';
+import 'package:we_pei_yang_flutter/commons/util/system_nav_util.dart';
 import 'package:we_pei_yang_flutter/commons/util/text_util.dart';
 import 'package:we_pei_yang_flutter/commons/util/toast_provider.dart';
 import 'package:we_pei_yang_flutter/commons/widgets/dialog/dialog_button.dart';
@@ -43,11 +44,21 @@ class _EditDetailPageState extends State<EditDetailPage> {
   var name = '';
   var credit = '';
 
+  /// 是否需要为金刚键留白（经典三键导航为 true，手势导航/非 Android 为 false）
+  bool _avoidNavBar = false;
+
   @override
   void initState() {
     super.initState();
     name = widget.name;
     credit = widget.credit;
+    _detectNavMode();
+  }
+
+  Future<void> _detectNavMode() async {
+    final threeButton = await SystemNavUtil.isThreeButtonNav();
+    if (!mounted) return;
+    setState(() => _avoidNavBar = threeButton);
   }
 
   @override
@@ -292,29 +303,38 @@ class _EditDetailPageState extends State<EditDetailPage> {
                 ),
               ),
             ),
-            Material(
-              color: WpyTheme.of(context).get(WpyColorKey.errorActionColor),
-              child: InkWell(
-                onTap: () async {
-                  bool? confirm = await _showDialog("您确定要删除该课程吗?");
-                  if (confirm == true) _deleteAndQuit(context);
-                },
-                splashFactory: InkRipple.splashFactory,
-                child: Container(
-                  width: double.infinity,
-                  height: 50.h,
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset('assets/images/schedule/dust_bin.png',
-                          height: 18.r, width: 18.r),
-                      SizedBox(width: 5.w),
-                      Text('删除',
-                          style: TextUtil.base.PingFangSC.medium
-                              .bright(context)
-                              .sp(14)),
-                    ],
+            // 三键导航（金刚键）时抬高导航栏高度，手势导航保持贴底不变
+            Padding(
+              padding: EdgeInsets.only(
+                bottom:
+                    _avoidNavBar ? MediaQuery.of(context).padding.bottom : 0,
+              ),
+              child: Material(
+                color:
+                    WpyTheme.of(context).get(WpyColorKey.errorActionColor),
+                child: InkWell(
+                  onTap: () async {
+                    bool? confirm =
+                        await _showDialog("您确定要删除该课程吗?");
+                    if (confirm == true) _deleteAndQuit(context);
+                  },
+                  splashFactory: InkRipple.splashFactory,
+                  child: Container(
+                    width: double.infinity,
+                    height: 50.h,
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset('assets/images/schedule/dust_bin.png',
+                            height: 18.r, width: 18.r),
+                        SizedBox(width: 5.w),
+                        Text('删除',
+                            style: TextUtil.base.PingFangSC.medium
+                                .bright(context)
+                                .sp(14)),
+                      ],
+                    ),
                   ),
                 ),
               ),
