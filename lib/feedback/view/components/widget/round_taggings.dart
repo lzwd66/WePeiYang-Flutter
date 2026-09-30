@@ -5,7 +5,7 @@ import 'package:we_pei_yang_flutter/commons/util/router_manager.dart';
 import 'package:we_pei_yang_flutter/commons/util/text_util.dart';
 import 'package:we_pei_yang_flutter/commons/widgets/loading.dart';
 import 'package:we_pei_yang_flutter/commons/widgets/wpy_pic.dart';
-import 'package:we_pei_yang_flutter/feedback/view/person_page.dart';
+import 'package:we_pei_yang_flutter/feedback/view/avatar_view/avatar_view_page.dart';
 import 'package:we_pei_yang_flutter/feedback/view/search_result_page.dart';
 
 import '../../../../commons/preferences/common_prefs.dart';
@@ -355,17 +355,15 @@ class _ProfileImageWithDetailedPopupState
   Widget build(BuildContext ctx) {
     return WButton(
       onPressed: () {
+        // 匿名帖（type == 1）只有管理员能看真实身份，维持原有权限语义
         if ((widget.type != 1) || hasAdmin)
-          Navigator.pushNamed(context, FeedbackRouter.person,
-              arguments: PersonPageArgs(
-                  widget.postOrCommentId,
-                  widget.fromPostCard,
-                  widget.type,
-                  widget.uid,
-                  widget.avatar,
-                  widget.nickName,
-                  widget.level,
-                  widget.heroTag));
+          Navigator.pushNamed(context, FeedbackRouter.avatarView,
+              arguments: AvatarViewPageArgs(
+                avatar: widget.avatar,
+                nickName: widget.nickName,
+                uid: widget.uid,
+                anonymous: widget.type == 1 && !hasAdmin,
+              ));
       },
       child: Stack(
         alignment: Alignment.center,

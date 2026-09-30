@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:we_pei_yang_flutter/feedback/view/History_page.dart';
+import 'package:we_pei_yang_flutter/feedback/view/avatar_view/avatar_view_page.dart';
 import 'package:we_pei_yang_flutter/feedback/view/collection_page.dart';
 import 'package:we_pei_yang_flutter/feedback/view/image_view/image_view_page.dart';
 import 'package:we_pei_yang_flutter/feedback/view/image_view/local_image_view_page.dart';
@@ -41,6 +42,7 @@ class FeedbackRouter {
   static String collection = 'feedback/collection';
   static String person = 'feedback/person';
   static String history = 'feedback/history';
+  static String avatarView = 'feedback/avatar_view';
 
   static final Map<String, Widget Function(dynamic arguments)> routers = {
     home: (args) => HomePage(args),
@@ -64,5 +66,6 @@ class FeedbackRouter {
     collection: (_) => CollectionPage(),
     person: (args) => PersonPage(args),
     history: (_) => HistoryPage(),
+    avatarView: (args) => AvatarViewPage(args),
   };
 }

@@ -33,4 +33,17 @@ class ImageSave {
         {"url": url, "fileName": fileName, "album": album});
     return resultPath!;
   }
+
+  /// 下载网络图片并保存到公共 DCIM 子目录（如 DCIM/wby）
+  ///
+  /// Android 10+ 走 MediaStore 插入，无需存储权限；Android 9- 由原生侧返回错误。
+  static Future<String> saveImageToDcim(
+    String url,
+    String fileName, {
+    String relativeDir = 'DCIM/wby',
+  }) async {
+    final savedName = await _channel.invokeMethod<String>("savePictureToDcim",
+        {"url": url, "fileName": fileName, "relativeDir": relativeDir});
+    return savedName ?? fileName;
+  }
 }
